@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "AI Research Assistant",
+    "version": "1.0",
+    "description": "Get AI-powered explanations of selected text on any webpage.",
+    "permissions": [
+      "contextMenus",
+      "scripting",
+      "activeTab"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://github.com/*"],
+        "js": ["contentScript.js"],
+        "run_at": "document_idle",
+        "all_frames": true
+      }
+    ],
+    "action": {
+      "default_title": "AI Research Assistant",
+      "default_popup": "popup.html"
+    }
+  }
+  
