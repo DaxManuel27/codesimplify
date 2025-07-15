@@ -104,77 +104,83 @@ function showExplanation(originalText, explanation) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.1);
         z-index: 10000;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: flex-end;
+        align-items: flex-start;
+        padding: 20px;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       }
       .ai-modal-content {
-        background: white;
-        border-radius: 12px;
-        max-width: 800px;
-        max-height: 80vh;
+        background: rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(3px);
+        border-radius: 8px;
+        width: 400px;
+        max-height: 60vh;
         overflow-y: auto;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        margin: 20px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
-      .ai-modal-header {
-        padding: 20px 24px 16px;
-        border-bottom: 1px solid #e5e5e5;
+            .ai-modal-header {
+        padding: 12px 16px 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
       .ai-modal-header h3 {
         margin: 0;
-        color: #333;
-        font-size: 18px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        font-weight: 600;
       }
       .ai-modal-close {
         background: none;
         border: none;
-        font-size: 24px;
+        font-size: 18px;
         cursor: pointer;
-        color: #666;
-        padding: 4px 8px;
+        color: rgba(255, 255, 255, 0.7);
+        padding: 2px 6px;
         border-radius: 4px;
       }
       .ai-modal-close:hover {
-        background: #f5f5f5;
-        color: #333;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.9);
       }
       .ai-modal-body {
-        padding: 24px;
+        padding: 16px;
       }
       .ai-original-text, .ai-explanation {
-        margin-bottom: 20px;
+        margin-bottom: 12px;
       }
       .ai-original-text h4, .ai-explanation h4 {
-        margin: 0 0 12px 0;
-        color: #555;
-        font-size: 14px;
+        margin: 0 0 8px 0;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 12px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
       .ai-original-text pre {
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
-        padding: 16px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        padding: 12px;
         overflow-x: auto;
-        font-size: 13px;
+        font-size: 12px;
         line-height: 1.4;
+        max-height: 150px;
+        color: rgba(255, 255, 255, 0.95);
       }
       .ai-explanation-content {
-        background: #f0f9ff;
-        border: 1px solid #bae6fd;
-        border-radius: 6px;
-        padding: 16px;
-        line-height: 1.6;
-        color: #0c4a6e;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        padding: 12px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 13px;
       }
     `;
     document.head.appendChild(styles);

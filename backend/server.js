@@ -1,4 +1,3 @@
-
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -12,7 +11,11 @@ app.use(express.json());
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
 function prompt(text) {
-    return " You are a senior software engineer, with the ability to explain coding concepts in any language. You will be given a code snippet, and you must do your best to explain the code in simple terms. You must try to understand the context of the code, but if not, just directly explain the functionality of the snipped to code. Here is the code snippet: " + text;
+    return `In one sentence, what does this code do?
+
+Code: ${text}
+
+Answer:`;
 }
 
 async function callGeminiAPI(text) {
