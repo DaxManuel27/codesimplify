@@ -1,6 +1,17 @@
 // Content Script for AI Research Assistant
 console.log('AI Research Assistant content script loaded');
 
+// Test function - remove this later
+window.testTypingAnimation = function() {
+  console.log('Testing typing animation...');
+  showExplanationModal('console.log("Hello World");');
+  
+  // Simulate API response after 1 second
+  setTimeout(() => {
+    startTypingInModal('');
+  }, 1000);
+};
+
 // Backend API URL
 const BACKEND_URL = 'http://localhost:3000';
 
@@ -19,7 +30,7 @@ document.addEventListener('mouseup', () => {
       console.log("Selected text:", selectedText);
     }
   });
-
+  
 document.addEventListener('keyup', () => {
     const selectedText = window.getSelection().toString().trim();
     if (selectedText.length > 0) {
@@ -27,19 +38,22 @@ document.addEventListener('keyup', () => {
       console.log("Selected text:", selectedText);
     }
   });
-
+``
   
 // Function to explain selected text
 async function explainSelectedText(text) {
+  console.log('explainSelectedText called with:', text);
+  
   if (!text || text.trim().length === 0) {
     showNotification('Please select some text to explain', 'error');
     return;
   }
 
-  // Show loading indicator
-  showNotification('Getting AI explanation...', 'loading');
+  // Show modal immediately with loading state
+  showExplanationModal(text);
 
   try {
+    console.log('Making API call to backend...');
     const response = await fetch(`${BACKEND_URL}/api/explain`, {
       method: 'POST',
       headers: {
@@ -48,24 +62,30 @@ async function explainSelectedText(text) {
       body: JSON.stringify({ text: text })
     });
 
+    console.log('Response received:', response.status);
     const data = await response.json();
+    console.log('Response data:', data);
 
     if (data.success) {
-      showExplanation(text, data.explanation);
+      console.log('Success! Starting typing animation with:', data.explanation);
+      startTypingInModal(data.explanation);
     } else {
-      showNotification(data.error || 'Failed to get explanation', 'error');
+      showErrorInModal(data.error || 'Failed to get explanation');
     }
   } catch (error) {
     console.error('Error communicating with backend:', error);
-    showNotification('Error: Unable to connect to AI service. Make sure the backend server is running.', 'error');
+    showErrorInModal('Error: Unable to connect to AI service. Make sure the backend server is running.');
   }
 }
 
-// Function to show explanation in a modal overlay
-function showExplanation(originalText, explanation) {
+// Function to show modal immediately with loading state
+function showExplanationModal(originalText) {
+  console.log('showExplanationModal called with originalText:', originalText);
+  
   // Remove any existing explanation modal
   const existingModal = document.getElementById('ai-explanation-modal');
   if (existingModal) {
+    console.log('Removing existing modal');
     existingModal.remove();
   }
 
@@ -76,7 +96,7 @@ function showExplanation(originalText, explanation) {
     <div class="ai-modal-overlay">
       <div class="ai-modal-content">
         <div class="ai-modal-header">
-          <h3>🤖 AI Code Explanation</h3>
+          <h3>CodeSimplify</h3>
           <button class="ai-modal-close">&times;</button>
         </div>
         <div class="ai-modal-body">
@@ -86,7 +106,9 @@ function showExplanation(originalText, explanation) {
           </div>
           <div class="ai-explanation">
             <h4>Explanation:</h4>
-            <div class="ai-explanation-content">${escapeHtml(explanation).replace(/\n/g, '<br>')}</div>
+            <div class="ai-explanation-content">
+              <div class="loading-text">🤖 Analyzing your code...</div>
+            </div>
           </div>
         </div>
       </div>
@@ -182,11 +204,29 @@ function showExplanation(originalText, explanation) {
         color: rgba(255, 255, 255, 0.95);
         font-size: 13px;
       }
+      .typing-cursor {
+        animation: blink 1s infinite;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+      .loading-text {
+        color: rgba(255, 255, 255, 0.7);
+        font-style: italic;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 1; }
+      }
     `;
     document.head.appendChild(styles);
   }
 
   // Add modal to page
+  console.log('Adding modal to page');
   document.body.appendChild(modal);
 
   // Add event listeners
@@ -208,6 +248,45 @@ function showExplanation(originalText, explanation) {
     }
   };
   document.addEventListener('keydown', handleEscape);
+}
+
+// Function to start typing animation in existing modal
+function startTypingInModal(explanation) {
+  console.log('startTypingInModal called with:', explanation);
+  
+  const modal = document.getElementById('ai-explanation-modal');
+  if (!modal) {
+    console.error('Modal not found!');
+    return;
+  }
+  
+  const explanationContainer = modal.querySelector('.ai-explanation-content');
+  if (!explanationContainer) {
+    console.error('Explanation container not found!');
+    return;
+  }
+  
+  console.log('Starting typing animation in existing modal');
+  startTypingAnimation(explanationContainer, explanation);
+}
+
+// Function to show error in existing modal
+function showErrorInModal(errorMessage) {
+  console.log('showErrorInModal called with:', errorMessage);
+  
+  const modal = document.getElementById('ai-explanation-modal');
+  if (!modal) {
+    console.error('Modal not found!');
+    return;
+  }
+  
+  const explanationContainer = modal.querySelector('.ai-explanation-content');
+  if (!explanationContainer) {
+    console.error('Explanation container not found!');
+    return;
+  }
+  
+  explanationContainer.innerHTML = `<div style="color: rgba(255, 100, 100, 0.9); font-style: italic;">❌ ${errorMessage}</div>`;
 }
 
 // Function to show notifications
@@ -270,4 +349,50 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Typing animation function
+function startTypingAnimation(container, text) {
+  console.log('Starting typing animation with text:', text.substring(0, 50) + '...');
+  const speed = 30; // milliseconds per character
+  let index = 0;
+  
+  // Clear any existing content and add cursor
+  container.innerHTML = '<span class="typing-cursor">|</span>';
+  
+  // Get cursor reference AFTER resetting innerHTML
+  const cursor = container.querySelector('.typing-cursor');
+  console.log('Cursor element found:', cursor);
+  
+  if (!cursor) {
+    console.error('Cursor element not found!');
+    container.innerHTML = text.replace(/\n/g, '<br>');
+    return;
+  }
+  
+  function typeCharacter() {
+    if (index < text.length) {
+      const char = text[index];
+      
+      // Handle line breaks
+      if (char === '\n') {
+        container.insertBefore(document.createElement('br'), cursor);
+      } else {
+        const textNode = document.createTextNode(char);
+        container.insertBefore(textNode, cursor);
+      }
+      
+      index++;
+      setTimeout(typeCharacter, speed);
+    } else {
+      // Remove cursor when typing is complete
+      console.log('Typing complete, removing cursor');
+      if (cursor && cursor.parentNode) {
+        cursor.remove();
+      }
+    }
+  }
+  
+  // Start typing after a short delay
+  setTimeout(typeCharacter, 500);
 }

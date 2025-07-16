@@ -4,6 +4,20 @@ const port = 3000;
 const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: {
+        success: false,
+        message: 'Too many requests, please try again later.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+app.use(limiter);
 
 app.use(cors());
 app.use(express.json());
@@ -11,34 +25,31 @@ app.use(express.json());
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
 function prompt(text) {
-    return `In one sentence, what does this code do?
+    return `In one sentence, what does this code do? If you believe the following code is not a valid coding language, return "Invalid code".
 
 Code: ${text}
 
 Answer:`;
-}
-
+}   
+32
 async function callGeminiAPI(text) {
     try {
         console.log('API Key exists:', !!process.env.API_KEY);
         console.log('Calling Gemini API...');
-        
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         const result = await model.generateContent(prompt(text));
         const response = await result.response;
         const textResult = response.text();
-        
-        console.log('API call successful');
-        return textResult;
-    } catch (error) {
+        return textResult;``
+    } catch (error) {``
         console.error('Gemini API Error:', error);
         throw error;
     }
 }
 
+app.use('/api/explain', limiter);
 
-
-app.post('/api/explain', async (req, res) => {
+app.post('/api/explain', async (req, res) => {``
     try {
         const { text } = req.body;
         
@@ -48,7 +59,7 @@ app.post('/api/explain', async (req, res) => {
                 error: 'Invalid input: text is required and must be a non-empty string' 
             });
         }
-        
+        ``
         // Limit text length to prevent abuse
         if (text.length > 10000) {
             return res.status(400).json({ 
