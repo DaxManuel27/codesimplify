@@ -1,17 +1,6 @@
 // Content Script for AI Research Assistant
 console.log('AI Research Assistant content script loaded');
 
-// Test function - remove this later
-window.testTypingAnimation = function() {
-  console.log('Testing typing animation...');
-  showExplanationModal('console.log("Hello World");');
-  
-  // Simulate API response after 1 second
-  setTimeout(() => {
-    startTypingInModal('');
-  }, 1000);
-};
-
 // Backend API URL
 const BACKEND_URL = 'http://localhost:3000';
 
@@ -22,24 +11,126 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return true;
 });
+// --- New code for the explain popup button ---
+
+let aiExplainButton = null;
+
+function showExplainPopupButton() {
+  // Remove previous button if it exists
+  if (aiExplainButton) {
+    aiExplainButton.remove();
+    aiExplainButton = null;
+  }
+
+  const selection = window.getSelection();
+  const selectedText = selection.toString().trim();
+
+  if (selectedText.length > 0) {
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+
+    aiExplainButton = document.createElement('button');
+    aiExplainButton.id = 'ai-explain-popup-button';
+    aiExplainButton.innerHTML = '✨ Explain Code';
+    document.body.appendChild(aiExplainButton);
+
+    // Position the button below the selection
+    aiExplainButton.style.position = 'absolute';
+    aiExplainButton.style.top = `${window.scrollY + rect.bottom + 5}px`;
+    aiExplainButton.style.left = `${window.scrollX + rect.left}px`;
+    aiExplainButton.style.zIndex = '9999';
+
+    // Add styles for the button
+    if (!document.getElementById('ai-popup-button-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'ai-popup-button-styles';
+        styles.textContent = `
+          #ai-explain-popup-button {
+            background: #4A4A58;
+            color: #E0E0E0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease-in-out;
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: fadeIn 0.3s forwards;
+          }
+          #ai-explain-popup-button:hover {
+            background: #5A5A68;
+            transform: translateY(0) scale(1.05);
+          }
+          @keyframes fadeIn {
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `;
+        document.head.appendChild(styles);
+    }
+
+    aiExplainButton.addEventListener('click', (e) => {
+      e.stopPropagation(); 
+      explainSelectedText(selectedText);
+      hideExplainPopupButton();
+    });
+  }
+}
+
+function hideExplainPopupButton() {
+  if (aiExplainButton) {
+    aiExplainButton.remove();
+    aiExplainButton = null;
+  }
+}
+
+// Show the button when text is selected
+document.addEventListener('mouseup', (e) => {
+    // Don't show button if clicking on the modal or the button itself
+    if (e.target.closest('#ai-explain-popup-button') || e.target.closest('#ai-explanation-modal')) {
+        return;
+    }
+    // Use timeout to allow selection to properly register
+    setTimeout(showExplainPopupButton, 10);
+});
+
+// Hide the button if user clicks away or selection disappears
+document.addEventListener('mousedown', (e) => {
+    if (e.target.closest('#ai-explain-popup-button')) {
+        return;
+    }
+    setTimeout(() => {
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) {
+            hideExplainPopupButton();
+        }
+    }, 200);
+});
+
+// --- End of new code ---
+
 // Detect when the user highlights text on the page
-document.addEventListener('mouseup', () => {
-    const selectedText = window.getSelection().toString().trim();
-    if (selectedText.length > 0) {
-      explainSelectedText(selectedText);
-      console.log("Selected text:", selectedText);
-    }
-  });
+// document.addEventListener('mouseup', () => {
+//     const selectedText = window.getSelection().toString().trim();
+//     if (selectedText.length > 0) {
+//       explainSelectedText(selectedText);
+//       console.log("Selected text:", selectedText);
+//     }
+//   });
   
-document.addEventListener('keyup', () => {
-    const selectedText = window.getSelection().toString().trim();
-    if (selectedText.length > 0) {
-      explainSelectedText(selectedText);
-      console.log("Selected text:", selectedText);
-    }
-  });
-``
-  
+// document.addEventListener('keyup', () => {
+//     const selectedText = window.getSelection().toString().trim();
+//     if (selectedText.length > 0) {
+//       explainSelectedText(selectedText);
+//       console.log("Selected text:", selectedText);
+//     }
+//   });
+
 // Function to explain selected text
 async function explainSelectedText(text) {
   console.log('explainSelectedText called with:', text);
