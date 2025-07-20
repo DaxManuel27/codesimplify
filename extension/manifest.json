@@ -3,9 +3,14 @@
     "name": "AI Research Assistant",
     "version": "1.0",
     "description": "Get AI-powered explanations of selected text on any webpage.",
+    "icons": {
+      "16": "icons/ChatGPT Image Jul 20, 2025, 02_06_43 PM.png",
+      "48": "icons/ChatGPT Image Jul 20, 2025, 02_06_43 PM.png",
+      "128": "icons/ChatGPT Image Jul 20, 2025, 02_06_43 PM.png"
+    },
     "permissions": [
       "contextMenus",
-      "scripting",
+      "scripting",  
       "activeTab"
     ],
     "background": {

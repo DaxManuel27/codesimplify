@@ -2,7 +2,7 @@
 console.log('AI Research Assistant content script loaded');
 
 // Backend API URL
-const BACKEND_URL = 'http://localhost:3000';
+const BACKEND_URL = 'https://codesimplify.onrender.com/';
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -55,7 +55,7 @@ function showExplainPopupButton() {
             font-size: 13px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transition: all 0.2s ease-in-out;
+            transition: all 0.2s ease-in-out; 
             opacity: 0;
             transform: translateY(-10px);
             animation: fadeIn 0.3s forwards;
