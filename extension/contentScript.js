@@ -1,5 +1,4 @@
-// Content Script for AI Research Assistant
-console.log('AI Research Assistant content script loaded');
+// Content Script for CodeSimplify - AI Code Explainer
 
 // Backend API URL
 const BACKEND_URL = 'https://codesimplify.onrender.com/';
@@ -11,7 +10,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return true;
 });
-// --- New code for the explain popup button ---
 
 let aiExplainButton = null;
 
@@ -112,29 +110,8 @@ document.addEventListener('mousedown', (e) => {
     }, 200);
 });
 
-// --- End of new code ---
-
-// Detect when the user highlights text on the page
-// document.addEventListener('mouseup', () => {
-//     const selectedText = window.getSelection().toString().trim();
-//     if (selectedText.length > 0) {
-//       explainSelectedText(selectedText);
-//       console.log("Selected text:", selectedText);
-//     }
-//   });
-  
-// document.addEventListener('keyup', () => {
-//     const selectedText = window.getSelection().toString().trim();
-//     if (selectedText.length > 0) {
-//       explainSelectedText(selectedText);
-//       console.log("Selected text:", selectedText);
-//     }
-//   });
-
 // Function to explain selected text
 async function explainSelectedText(text) {
-  console.log('explainSelectedText called with:', text);
-  
   if (!text || text.trim().length === 0) {
     showNotification('Please select some text to explain', 'error');
     return;
@@ -144,7 +121,6 @@ async function explainSelectedText(text) {
   showExplanationModal(text);
 
   try {
-    console.log('Making API call to backend...');
     const response = await fetch(`${BACKEND_URL}/api/explain`, {
       method: 'POST',
       headers: {
@@ -153,30 +129,23 @@ async function explainSelectedText(text) {
       body: JSON.stringify({ text: text })
     });
 
-    console.log('Response received:', response.status);
     const data = await response.json();
-    console.log('Response data:', data);
 
     if (data.success) {
-      console.log('Success! Starting typing animation with:', data.explanation);
       startTypingInModal(data.explanation);
     } else {
       showErrorInModal(data.error || 'Failed to get explanation');
     }
   } catch (error) {
-    console.error('Error communicating with backend:', error);
-    showErrorInModal('Error: Unable to connect to AI service. Make sure the backend server is running.');
+    showErrorInModal('Error: Unable to connect to AI service. Please try again later.');
   }
 }
 
 // Function to show modal immediately with loading state
 function showExplanationModal(originalText) {
-  console.log('showExplanationModal called with originalText:', originalText);
-  
   // Remove any existing explanation modal
   const existingModal = document.getElementById('ai-explanation-modal');
   if (existingModal) {
-    console.log('Removing existing modal');
     existingModal.remove();
   }
 
@@ -235,7 +204,7 @@ function showExplanationModal(originalText) {
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
       }
-            .ai-modal-header {
+      .ai-modal-header {
         padding: 12px 16px 8px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
@@ -317,7 +286,6 @@ function showExplanationModal(originalText) {
   }
 
   // Add modal to page
-  console.log('Adding modal to page');
   document.body.appendChild(modal);
 
   // Add event listeners
@@ -343,37 +311,28 @@ function showExplanationModal(originalText) {
 
 // Function to start typing animation in existing modal
 function startTypingInModal(explanation) {
-  console.log('startTypingInModal called with:', explanation);
-  
   const modal = document.getElementById('ai-explanation-modal');
   if (!modal) {
-    console.error('Modal not found!');
     return;
   }
   
   const explanationContainer = modal.querySelector('.ai-explanation-content');
   if (!explanationContainer) {
-    console.error('Explanation container not found!');
     return;
   }
   
-  console.log('Starting typing animation in existing modal');
   startTypingAnimation(explanationContainer, explanation);
 }
 
 // Function to show error in existing modal
 function showErrorInModal(errorMessage) {
-  console.log('showErrorInModal called with:', errorMessage);
-  
   const modal = document.getElementById('ai-explanation-modal');
   if (!modal) {
-    console.error('Modal not found!');
     return;
   }
   
   const explanationContainer = modal.querySelector('.ai-explanation-content');
   if (!explanationContainer) {
-    console.error('Explanation container not found!');
     return;
   }
   
@@ -444,7 +403,6 @@ function escapeHtml(text) {
 
 // Typing animation function
 function startTypingAnimation(container, text) {
-  console.log('Starting typing animation with text:', text.substring(0, 50) + '...');
   const speed = 30; // milliseconds per character
   let index = 0;
   
@@ -453,10 +411,8 @@ function startTypingAnimation(container, text) {
   
   // Get cursor reference AFTER resetting innerHTML
   const cursor = container.querySelector('.typing-cursor');
-  console.log('Cursor element found:', cursor);
   
   if (!cursor) {
-    console.error('Cursor element not found!');
     container.innerHTML = text.replace(/\n/g, '<br>');
     return;
   }
@@ -477,7 +433,6 @@ function startTypingAnimation(container, text) {
       setTimeout(typeCharacter, speed);
     } else {
       // Remove cursor when typing is complete
-      console.log('Typing complete, removing cursor');
       if (cursor && cursor.parentNode) {
         cursor.remove();
       }

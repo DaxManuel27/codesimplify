@@ -1,12 +1,12 @@
 {
     "manifest_version": 3,
-    "name": "AI Research Assistant",
-    "version": "1.0",
-    "description": "Get AI-powered explanations of selected text on any webpage.",
+    "name": "CodeSimplify - AI Code Explainer",
+    "version": "1.0.0",
+    "description": "Get instant AI-powered explanations of code snippets on GitHub. Simply select code and get clear, detailed explanations to help you understand any programming language.",
     "icons": {
-      "16": "icons/ChatGPT Image Jul 20, 2025, 02_06_43 PM.png",
-      "48": "icons/ChatGPT Image Jul 20, 2025, 02_06_43 PM.png",
-      "128": "icons/ChatGPT Image Jul 20, 2025, 02_06_43 PM.png"
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
     },
     "permissions": [
       "contextMenus",
@@ -25,7 +25,7 @@
       }
     ],
     "action": {
-      "default_title": "AI Research Assistant",
+      "default_title": "CodeSimplify - AI Code Explainer",
       "default_popup": "popup.html"
     }
   }
