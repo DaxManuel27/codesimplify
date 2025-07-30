@@ -1,7 +1,7 @@
 // Content Script for CodeSimplify - AI Code Explainer
 
 // Backend API URL
-const BACKEND_URL = 'https://codesimplify.onrender.com/';
+const BACKEND_URL = 'https://codesimplify-o8m3.vercel.app/';
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
